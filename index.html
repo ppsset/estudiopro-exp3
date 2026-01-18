@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE Toolbox</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">EE Toolbox</span>
+        </div>
+        <button class="icon-button" id="toggleSidebar" aria-label="Toggle sidebar">☰</button>
+      </div>
+      <nav class="nav">
+        <button class="nav-link active" data-section="home"><span>🏠</span><span class="nav-text">Home</span></button>
+        <button class="nav-link" data-section="module-conduit"><span>🧰</span><span class="nav-text">Conduit & Wireway</span></button>
+        <button class="nav-link" data-section="module-vdrop"><span>📉</span><span class="nav-text">Voltage Drop</span></button>
+        <button class="nav-link" data-section="module-shortcircuit"><span>⚠️</span><span class="nav-text">Short Circuit</span></button>
+        <button class="nav-link" data-section="module-pfc"><span>🧮</span><span class="nav-text">Power Factor</span></button>
+        <button class="nav-link" data-section="module-powerquality"><span>🎛️</span><span class="nav-text">Power Quality</span></button>
+        <button class="nav-link" data-section="module-pv"><span>☀️</span><span class="nav-text">PV Design</span></button>
+        <button class="nav-link" data-section="library"><span>📚</span><span class="nav-text">Data Library</span></button>
+        <button class="nav-link" data-section="settings"><span>⚙️</span><span class="nav-text">Settings</span></button>
+        <button class="nav-link" data-section="help"><span>❓</span><span class="nav-text">Help</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <p class="disclaimer">For preliminary design only; verify with applicable codes/standards and manufacturer data.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section id="home" class="section active">
+        <header class="section-header">
+          <div>
+            <h1>Engineering Dashboard</h1>
+            <p class="subtitle">Bright-mode toolkit for electrical engineers and MEP designers.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" id="exportAll">Export Projects JSON</button>
+            <label class="secondary" for="importAll">Import JSON</label>
+            <input type="file" id="importAll" accept="application/json" hidden />
+          </div>
+        </header>
+
+        <div class="card-grid" id="moduleCards"></div>
+
+        <div class="dashboard-columns">
+          <div class="card">
+            <h3>Recent Calculations</h3>
+            <ul id="recentList" class="list"></ul>
+          </div>
+          <div class="card">
+            <h3>Favorites</h3>
+            <ul id="favoritesList" class="list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="module-conduit" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Conduit & Wireway Sizing</h1>
+            <p class="subtitle">Size conduits and wireways based on conductor count, insulation, and fill limits.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="conduit">Example Inputs</button>
+            <button class="secondary" data-save="conduit">Save Scenario</button>
+            <button class="secondary" data-duplicate="conduit">Duplicate</button>
+            <button class="secondary" data-compare="conduit">Compare</button>
+            <button class="primary" data-calc="conduit">Calculate</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="conduit">
+              <label>System
+                <select name="system">
+                  <option value="1ph">1φ</option>
+                  <option value="3ph" selected>3φ</option>
+                </select>
+              </label>
+              <label>Voltage Label
+                <input name="voltageLabel" type="text" value="400 V" />
+              </label>
+              <label>Material
+                <select name="material">
+                  <option value="cu" selected>Copper (Cu)</option>
+                  <option value="al">Aluminum (Al)</option>
+                </select>
+              </label>
+              <label>Conductor size (mm²)
+                <input name="conductorSize" type="number" min="1" step="0.5" value="50" title="Cross-sectional area in mm²." />
+              </label>
+              <label>Insulation type
+                <select name="insulation">
+                  <option value="xlpe" selected>XLPE</option>
+                  <option value="pvc">PVC</option>
+                  <option value="lszh">LSZH</option>
+                </select>
+              </label>
+              <label>Phase conductors
+                <input name="phaseCount" type="number" min="1" value="3" />
+              </label>
+              <label>Neutrals
+                <input name="neutralCount" type="number" min="0" value="1" />
+              </label>
+              <label>Grounds
+                <input name="groundCount" type="number" min="0" value="1" />
+              </label>
+              <label>Spares
+                <input name="spareCount" type="number" min="0" value="0" />
+              </label>
+              <label>Cable OD (mm)
+                <input name="cableOd" type="number" min="1" step="0.1" value="18" title="Outer diameter from cable library or datasheet." />
+              </label>
+              <label>Conduit type
+                <select name="conduitType">
+                  <option value="pvc">PVC</option>
+                  <option value="emt" selected>EMT</option>
+                  <option value="rmc">RMC</option>
+                  <option value="hdpe">HDPE</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label>Conduit internal diameter (mm)
+                <input name="conduitId" type="number" min="10" value="50" />
+              </label>
+              <label>Fill limit (%)
+                <input name="fillLimit" type="number" min="20" max="60" value="40" title="Default 40% per common fill rules." />
+              </label>
+              <label>Wireway fill limit (%)
+                <input name="wirewayFill" type="number" min="10" max="60" value="20" title="Configurable per project standards." />
+              </label>
+              <label>Wireway width (mm)
+                <input name="wirewayW" type="number" min="50" value="150" />
+              </label>
+              <label>Wireway height (mm)
+                <input name="wirewayH" type="number" min="50" value="100" />
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="conduit"></div>
+            <button class="secondary" data-report="conduit">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="conduit"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="conduit"></div>
+        <div class="card compare-panel" data-compare-panel="conduit"></div>
+      </section>
+
+      <section id="module-vdrop" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Voltage Drop Calculation</h1>
+            <p class="subtitle">Resistive-only or impedance-based voltage drop with PF support.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="vdrop">Example Inputs</button>
+            <button class="secondary" data-save="vdrop">Save Scenario</button>
+            <button class="secondary" data-duplicate="vdrop">Duplicate</button>
+            <button class="secondary" data-compare="vdrop">Compare</button>
+            <button class="primary" data-calc="vdrop">Calculate</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="vdrop">
+              <label>System
+                <select name="system">
+                  <option value="1ph">1φ</option>
+                  <option value="3ph" selected>3φ</option>
+                </select>
+              </label>
+              <label>Voltage (V)
+                <input name="voltage" type="number" value="400" />
+              </label>
+              <label>Load current (A)
+                <input name="current" type="number" value="120" title="Leave blank to calculate from kW and PF." />
+              </label>
+              <label>Load power (kW)
+                <input name="powerKw" type="number" value="60" title="Used to derive current if current is empty." />
+              </label>
+              <label>Power factor
+                <input name="pf" type="number" min="0.5" max="1" step="0.01" value="0.9" />
+              </label>
+              <label>One-way length (m)
+                <input name="length" type="number" value="80" />
+              </label>
+              <label>Length input
+                <select name="lengthType">
+                  <option value="oneway" selected>One-way</option>
+                  <option value="loop">Loop</option>
+                </select>
+              </label>
+              <label>Conductor size (mm²)
+                <input name="conductorSize" type="number" value="50" />
+              </label>
+              <label>Material
+                <select name="material">
+                  <option value="cu" selected>Copper</option>
+                  <option value="al">Aluminum</option>
+                </select>
+              </label>
+              <label>Temperature (°C)
+                <input name="temperature" type="number" value="75" />
+              </label>
+              <label>Parallel runs
+                <input name="parallels" type="number" value="1" />
+              </label>
+              <label>Method
+                <select name="method">
+                  <option value="r" selected>Resistive only</option>
+                  <option value="rx">R + X</option>
+                </select>
+              </label>
+              <label>Reactance X (Ω/km)
+                <input name="reactance" type="number" value="0.08" title="Typical cable reactance from library." />
+              </label>
+              <label>Drop limit (%)
+                <input name="limit" type="number" value="3" />
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="vdrop"></div>
+            <button class="secondary" data-report="vdrop">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="vdrop"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="vdrop"></div>
+        <div class="card compare-panel" data-compare-panel="vdrop"></div>
+      </section>
+
+      <section id="module-shortcircuit" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Short Circuit Calculation</h1>
+            <p class="subtitle">Transformer-based short-circuit current estimate with feeder impedance.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="shortcircuit">Example Inputs</button>
+            <button class="secondary" data-save="shortcircuit">Save Scenario</button>
+            <button class="secondary" data-duplicate="shortcircuit">Duplicate</button>
+            <button class="secondary" data-compare="shortcircuit">Compare</button>
+            <button class="primary" data-calc="shortcircuit">Calculate</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="shortcircuit">
+              <label>System
+                <select name="system">
+                  <option value="3ph" selected>3φ</option>
+                  <option value="1ph">1φ</option>
+                </select>
+              </label>
+              <label>Transformer rating (kVA)
+                <input name="kva" type="number" value="1500" />
+              </label>
+              <label>Primary voltage (kV)
+                <input name="primaryKv" type="number" value="22" />
+              </label>
+              <label>Secondary voltage (V)
+                <input name="secondaryV" type="number" value="400" />
+              </label>
+              <label>%Z
+                <input name="percentZ" type="number" value="6" title="Transformer impedance percent." />
+              </label>
+              <label>X/R ratio (optional)
+                <input name="xr" type="number" value="8" title="Used for peak making current estimate." />
+              </label>
+              <label>Fault location
+                <select name="faultLocation">
+                  <option value="bus" selected>Transformer secondary bus</option>
+                  <option value="feeder">End of feeder</option>
+                </select>
+              </label>
+              <label>Feeder length (m)
+                <input name="feederLength" type="number" value="60" />
+              </label>
+              <label>Conductor size (mm²)
+                <input name="conductorSize" type="number" value="70" />
+              </label>
+              <label>Material
+                <select name="material">
+                  <option value="cu" selected>Copper</option>
+                  <option value="al">Aluminum</option>
+                </select>
+              </label>
+              <label>Parallel runs
+                <input name="parallels" type="number" value="2" />
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="shortcircuit"></div>
+            <button class="secondary" data-report="shortcircuit">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="shortcircuit"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="shortcircuit"></div>
+        <div class="card compare-panel" data-compare-panel="shortcircuit"></div>
+      </section>
+
+      <section id="module-pfc" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Power Factor Correction</h1>
+            <p class="subtitle">Size capacitor banks and estimate current reduction with payback.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="pfc">Example Inputs</button>
+            <button class="secondary" data-save="pfc">Save Scenario</button>
+            <button class="secondary" data-duplicate="pfc">Duplicate</button>
+            <button class="secondary" data-compare="pfc">Compare</button>
+            <button class="primary" data-calc="pfc">Calculate</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="pfc">
+              <label>Real power (kW)
+                <input name="kw" type="number" value="450" />
+              </label>
+              <label>Existing PF
+                <input name="pfExisting" type="number" step="0.01" value="0.78" title="Current power factor." />
+              </label>
+              <label>Target PF
+                <input name="pfTarget" type="number" step="0.01" value="0.95" title="Desired power factor after correction." />
+              </label>
+              <label>System voltage (V)
+                <input name="voltage" type="number" value="400" />
+              </label>
+              <label>System
+                <select name="system">
+                  <option value="3ph" selected>3φ</option>
+                  <option value="1ph">1φ</option>
+                </select>
+              </label>
+              <label>Frequency (Hz)
+                <input name="frequency" type="number" value="50" />
+              </label>
+              <label>Average demand (kW)
+                <input name="avgKw" type="number" value="320" />
+              </label>
+              <label>Peak demand (kW)
+                <input name="peakKw" type="number" value="450" />
+              </label>
+              <label>Penalty rate (currency/kvar)
+                <input name="penalty" type="number" value="0" />
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="pfc"></div>
+            <button class="secondary" data-report="pfc">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="pfc"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="pfc"></div>
+        <div class="card compare-panel" data-compare-panel="pfc"></div>
+      </section>
+
+      <section id="module-powerquality" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Power Quality Improvement</h1>
+            <p class="subtitle">Rule-based diagnostics with explainable recommendations.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="powerquality">Example Inputs</button>
+            <button class="secondary" data-save="powerquality">Save Scenario</button>
+            <button class="secondary" data-duplicate="powerquality">Duplicate</button>
+            <button class="secondary" data-compare="powerquality">Compare</button>
+            <button class="primary" data-calc="powerquality">Analyze</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="powerquality">
+              <fieldset>
+                <legend>Symptoms</legend>
+                <label><input type="checkbox" name="symptoms" value="flicker" checked /> Flicker</label>
+                <label><input type="checkbox" name="symptoms" value="neutral" /> Overheating neutral</label>
+                <label><input type="checkbox" name="symptoms" value="trips" checked /> Nuisance trips</label>
+                <label><input type="checkbox" name="symptoms" value="capacitor" /> Capacitor failures</label>
+                <label><input type="checkbox" name="symptoms" value="vfdnoise" checked /> VFD noise</label>
+              </fieldset>
+              <label>THD-V (%)
+                <input name="thdv" type="number" value="4" title="Voltage total harmonic distortion." />
+              </label>
+              <label>THD-I (%)
+                <input name="thdi" type="number" value="18" title="Current total harmonic distortion." />
+              </label>
+              <label>Voltage unbalance (%)
+                <input name="unbalance" type="number" value="2" />
+              </label>
+              <label>Sags/swells count (monthly)
+                <input name="sags" type="number" value="3" />
+              </label>
+              <label>PF
+                <input name="pf" type="number" step="0.01" value="0.85" />
+              </label>
+              <label>Demand (kVA)
+                <input name="kva" type="number" value="500" />
+              </label>
+              <label>VFD load (%)
+                <input name="vfd" type="number" value="35" />
+              </label>
+              <label>UPS load (%)
+                <input name="ups" type="number" value="15" />
+              </label>
+              <label>Welding load (%)
+                <input name="welding" type="number" value="5" />
+              </label>
+              <label>HVAC load (%)
+                <input name="hvac" type="number" value="25" />
+              </label>
+              <label>Lighting type
+                <select name="lighting">
+                  <option value="led" selected>LED</option>
+                  <option value="fluorescent">Fluorescent</option>
+                  <option value="hid">HID</option>
+                </select>
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="powerquality"></div>
+            <button class="secondary" data-report="powerquality">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="powerquality"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="powerquality"></div>
+        <div class="card compare-panel" data-compare-panel="powerquality"></div>
+      </section>
+
+      <section id="module-pv" class="section">
+        <header class="section-header">
+          <div>
+            <h1>PV System Design</h1>
+            <p class="subtitle">Preliminary PV sizing with simple economics and cashflow.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" data-example="pv">Example Inputs</button>
+            <button class="secondary" data-save="pv">Save Scenario</button>
+            <button class="secondary" data-duplicate="pv">Duplicate</button>
+            <button class="secondary" data-compare="pv">Compare</button>
+            <button class="primary" data-calc="pv">Calculate</button>
+          </div>
+        </header>
+        <div class="module-grid">
+          <div class="card">
+            <h3>Inputs</h3>
+            <form class="form-grid" data-form="pv">
+              <label>Available area (m²)
+                <input name="area" type="number" value="500" />
+              </label>
+              <label>Panel power (W)
+                <input name="panelPower" type="number" value="550" />
+              </label>
+              <label>Panel area (m²)
+                <input name="panelArea" type="number" step="0.01" value="2.4" />
+              </label>
+              <label>Performance ratio (PR)
+                <input name="pr" type="number" step="0.01" value="0.8" title="System losses factor, typically 0.75-0.85." />
+              </label>
+              <label>Solar irradiation (kWh/m²/day)
+                <input name="irradiation" type="number" step="0.1" value="4.6" />
+              </label>
+              <label>Annual yield (kWh/kWp)
+                <input name="annualYield" type="number" value="1500" />
+              </label>
+              <label>DC/AC ratio
+                <input name="dcac" type="number" step="0.01" value="1.2" title="Oversizing of DC array vs inverter." />
+              </label>
+              <label>Electricity price
+                <input name="price" type="number" step="0.01" value="0.12" />
+              </label>
+              <label>Escalation (%)
+                <input name="escalation" type="number" step="0.1" value="2" />
+              </label>
+              <label>System cost (per kW)
+                <input name="costPerKw" type="number" value="900" />
+              </label>
+              <label>O&M (% of capex)
+                <input name="om" type="number" step="0.1" value="1.5" />
+              </label>
+              <label>Incentives (total)
+                <input name="incentives" type="number" value="0" />
+              </label>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Results</h3>
+            <div class="results" data-results="pv"></div>
+            <button class="secondary" data-report="pv">Printable Report</button>
+          </div>
+          <div class="card">
+            <h3>Assumptions & Notes</h3>
+            <div class="notes" data-notes="pv"></div>
+          </div>
+        </div>
+        <div class="card scenario-panel" data-scenarios="pv"></div>
+        <div class="card compare-panel" data-compare-panel="pv"></div>
+      </section>
+
+      <section id="library" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Editable Data Library</h1>
+            <p class="subtitle">Maintain conductor properties, cable ODs, and fill limits used across modules.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary" id="resetLibrary">Reset Defaults</button>
+            <button class="primary" id="saveLibrary">Save Library</button>
+          </div>
+        </header>
+        <div class="library-grid">
+          <div class="card">
+            <h3>Conductor Properties (Ω·mm²/m, °C coeff)</h3>
+            <textarea id="libraryConductor"></textarea>
+          </div>
+          <div class="card">
+            <h3>Reactance & Impedance Library (Ω/km)</h3>
+            <textarea id="libraryReactance"></textarea>
+          </div>
+          <div class="card">
+            <h3>Cable OD Library (mm)</h3>
+            <textarea id="libraryCable"></textarea>
+          </div>
+          <div class="card">
+            <h3>Conduit & Wireway Fill Limits</h3>
+            <textarea id="libraryFill"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Global Settings</h1>
+            <p class="subtitle">Default frequency, voltage systems, and formatting preferences.</p>
+          </div>
+          <div class="header-actions">
+            <button class="primary" id="saveSettings">Save Settings</button>
+          </div>
+        </header>
+        <div class="card">
+          <form class="form-grid" id="settingsForm">
+            <label>Frequency (Hz)
+              <select name="frequency">
+                <option value="50" selected>50 Hz</option>
+                <option value="60">60 Hz</option>
+              </select>
+            </label>
+            <label>Default voltage systems
+              <input name="voltageSystems" type="text" value="400/230V, 415/240V, 480/277V" />
+            </label>
+            <label>Default material
+              <select name="material">
+                <option value="cu" selected>Copper</option>
+                <option value="al">Aluminum</option>
+              </select>
+            </label>
+            <label>Default temperature (°C)
+              <input name="temperature" type="number" value="75" />
+            </label>
+            <label>Currency
+              <select name="currency">
+                <option value="USD" selected>USD</option>
+                <option value="THB">THB</option>
+              </select>
+            </label>
+            <label>Number format
+              <select name="format">
+                <option value="en-US" selected>1,234.56</option>
+                <option value="de-DE">1.234,56</option>
+              </select>
+            </label>
+          </form>
+        </div>
+      </section>
+
+      <section id="help" class="section">
+        <header class="section-header">
+          <div>
+            <h1>Help & Glossary</h1>
+            <p class="subtitle">Key terms and how EE Toolbox performs calculations.</p>
+          </div>
+        </header>
+        <div class="card">
+          <h3>Glossary</h3>
+          <ul class="list">
+            <li><strong>kW</strong>: Real power.</li>
+            <li><strong>kVA</strong>: Apparent power.</li>
+            <li><strong>kvar</strong>: Reactive power.</li>
+            <li><strong>PF</strong>: Power factor = kW / kVA.</li>
+            <li><strong>THD</strong>: Total harmonic distortion.</li>
+            <li><strong>X/R</strong>: Reactance-to-resistance ratio.</li>
+            <li><strong>%Z</strong>: Transformer impedance percent.</li>
+            <li><strong>PR</strong>: PV performance ratio.</li>
+          </ul>
+          <p class="disclaimer">For preliminary design only; verify with applicable codes/standards and manufacturer data.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="module-card-template">
+    <div class="card module-card">
+      <div class="module-card-header">
+        <span class="module-icon">⚙️</span>
+        <div>
+          <h3></h3>
+          <p></p>
+        </div>
+      </div>
+      <button class="secondary">Open Module</button>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
